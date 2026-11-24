@@ -13,8 +13,8 @@ USERNAME = "akhmad045"
 OUTPUT_PATH = os.environ.get("ENTRY_OUTPUT", "/output/entry.txt")
 
 
-def main() -> None:
-    text = USERNAME
+def validate(text: str) -> None:
+    """Gate: 1-30 UTF-8 chars, one word, no padding."""
     if not text or text != text.strip():
         raise SystemExit("entry must not be blank or padded")
     if any(ch.isspace() for ch in text):
@@ -22,15 +22,21 @@ def main() -> None:
     if not 1 <= len(text) <= 30:
         raise SystemExit("entry must be 1-30 characters")
 
+
+def main() -> None:
+    validate(USERNAME)
+
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
-        f.write(text)
+        f.write(USERNAME)
 
     with open(OUTPUT_PATH, "rb") as f:
         raw = f.read()
-    if raw.decode("utf-8") != text:
+    if raw.decode("utf-8") != USERNAME:
         raise SystemExit("round-trip check failed")
-    print(f"wrote {len(text)} characters to {OUTPUT_PATH}")
+    if len(raw) != len(USERNAME.encode("utf-8")):
+        raise SystemExit("byte-length check failed")
+    print(f"wrote {len(USERNAME)} characters to {OUTPUT_PATH}")
 
 
 if __name__ == "__main__":
